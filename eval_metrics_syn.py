@@ -19,11 +19,11 @@ _ = torch.manual_seed(202208)
 compute_lpips = LPIPS()
 
 # prediction path
-path = '/mnt/sda/experiments/cvpr23/Mip-NeRF-360/logs_MS-Mip-NeRF-360/*/test_preds'
+path = '/mnt/sda/experiments/cvpr23/Mip-NeRF-360/logs_MS-Mip-NeRF-360/Scene*/test_preds'
 # ground truth path
 gt_path_root = '/mnt/sda/T3/cvpr23/dataset/synthetic_scenes'
 basedir = '/'.join(path.split('/')[:-2])
-results_list = glob.glob(path)
+results_list = sorted(glob.glob(path))
 results_dict = {}
 for scene in results_list:
     scene_name = scene.split('/')[-2]
@@ -76,5 +76,5 @@ whole_avg = {
     'avg_lpips' : np.mean(whole_lpipss)
 }
 results_dict['whole'] = whole_avg
-with open(os.path.join(basedir, 'psnr_ssim_lpips.json'), 'w') as f:
+with open(os.path.join(basedir, 'psnr_ssim_lpips_syn.json'), 'w') as f:
     json.dump(results_dict, f)

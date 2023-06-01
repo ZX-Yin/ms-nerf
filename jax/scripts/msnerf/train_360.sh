@@ -13,19 +13,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export CUDA_VISIBLE_DEVICES=0
+export CUDA_VISIBLE_DEVICES='0,1'
 
+# for synthetic part
 SCENE=Scene01
 EXPERIMENT=logs_Mip-NeRF-360
 DATA_DIR=/mnt/sda/T3/cvpr23/dataset/synthetic_scenes
 CHECKPOINT_DIR=/mnt/sda/experiments/cvpr23/Mip-NeRF-360/"$EXPERIMENT"/"$SCENE"
 
-# If running one of the indoor scenes, add
-# --gin_bindings="Config.factor = 2"
+rm "$CHECKPOINT_DIR"/*
+python -m train \
+  --gin_configs=configs/ms-nerf/360.gin \
+  --gin_bindings="Config.data_dir = '${DATA_DIR}/${SCENE}'" \
+  --gin_bindings="Config.checkpoint_dir = '${CHECKPOINT_DIR}'" \
+  --logtostderr
+
+# for real captured part
+SCENE=Scan01
+EXPERIMENT=logs_Mip-NeRF-360
+DATA_DIR=/mnt/sda/T3/cvpr23/dataset/posed_real_scenes
+CHECKPOINT_DIR=/mnt/sda/experiments/cvpr23/Mip-NeRF-360/"$EXPERIMENT"/"$SCENE"
 
 rm "$CHECKPOINT_DIR"/*
 python -m train \
   --gin_configs=configs/ms-nerf/360.gin \
+  --gin_bindings="Config.dataset_loader = 'llff'" \
+  --gin_bindings="Config.factor = 8" \
   --gin_bindings="Config.data_dir = '${DATA_DIR}/${SCENE}'" \
   --gin_bindings="Config.checkpoint_dir = '${CHECKPOINT_DIR}'" \
   --logtostderr

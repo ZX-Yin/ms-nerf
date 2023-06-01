@@ -1,3 +1,4 @@
+import sys
 sys.path.insert(0,'jax/internal/pycolmap')
 sys.path.insert(0,'jax/internal/pycolmap/pycolmap')
 import os
@@ -14,7 +15,7 @@ from tqdm import tqdm
 from typing import Mapping, Optional, Sequence, Text, Tuple, Union
 import enum
 import types
-import sys
+
 import pycolmap
 
 _Array = Union[np.ndarray]
@@ -177,7 +178,6 @@ def load_gts(data_dir, llffhold = 8, factor = 8, load_alphabetical = True):
                      for f in image_names]
     images = [load_image(x) for x in image_paths]
     images = np.stack(images, axis=0)
-    print (f'# of images: {len(images)}')
     test_indices = np.arange(images.shape[0])[::llffhold]
     test_images = images[test_indices]
     
@@ -194,12 +194,12 @@ _ = torch.manual_seed(202208)
 compute_lpips = LPIPS()
 
 # prediction path
-path = '/root/data/yzx/cvpr23_real_cap/Mip-NeRF-360/logs_Mip-NeRF-360/*/test_preds'
+path = '/mnt/sda/experiments/cvpr23/Mip-NeRF-360/logs_Mip-NeRF-360/Scan*/test_preds'
 # ground truth path
-gt_path_root = '/root/data/yzx/paper-dataset-real'
+gt_path_root = '/mnt/sda/experiments/cvpr23_real_cap_dataset'
 basedir = '/'.join(path.split('/')[:-2])
 
-results_list = glob.glob(path)
+results_list = sorted(glob.glob(path))
 results_dict = {}
 for scene in results_list:
     scene_name = scene.split('/')[-2].split('_')[-1]
@@ -257,5 +257,5 @@ whole_avg = {
     'avg_lpips' : np.mean(whole_lpipss)
 }
 results_dict['whole'] = whole_avg
-with open(os.path.join(basedir, 'psnr_ssim_lpips.json'), 'w') as f:
+with open(os.path.join(basedir, 'psnr_ssim_lpips_llff.json'), 'w') as f:
     json.dump(results_dict, f)
