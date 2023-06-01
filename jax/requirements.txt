@@ -1,0 +1,17 @@
+numpy
+jax[cuda11_cudnn82]==0.3.24 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+flax==0.6.2
+opencv-python
+Pillow
+tensorboard
+tensorflow
+gin-config
+dm_pix
+rawpy
+mediapy
+einops
+torch==1.10.1
+torchvision==0.11.2
+torchmetrics==0.9.3
+tqdm
+lpips==0.1.4

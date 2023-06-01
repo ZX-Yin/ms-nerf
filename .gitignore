@@ -1,0 +1,6 @@
+jax/internal/pycolmap
+**/__pycache__
+.DS_Store
+.vscode/
+.idea/
+__MACOSX/
