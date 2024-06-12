@@ -307,7 +307,10 @@ class Model(nn.Module):
         # with `ray_` they get treated differently downstream --- they're
         # treated as bags of rays, rather than image chunks.
         n = self.config.vis_num_rays
+        if self.config.eval_one:
+          n = rays.origins.shape[0]
         rendering['ray_sdist'] = sdist.reshape([-1, sdist.shape[-1]])[:n, :]
+        rendering['ray_densities'] = ray_results['density'][:n]
         rendering['ray_weights'] = (
             weights.reshape([-1, weights.shape[-1]])[:n, :])
         rgb = ray_results['rgb']
@@ -764,9 +767,13 @@ def render_image(render_fn: Callable[[jnp.array, utils.Rays],
   keys = [k for k in rendering if k.startswith('ray_')]
   if keys:
     num_rays = rendering[keys[0]][0].shape[0]
-    ray_idx = random.permutation(random.PRNGKey(0), num_rays)
-    ray_idx = ray_idx[:config.vis_num_rays]
-    for k in keys:
-      rendering[k] = [r[ray_idx] for r in rendering[k]]
+    if config.eval_one:
+      for k in keys:
+        rendering[k] = [z.reshape((height, width) + z.shape[1:]) for z in rendering[k]]
+    else:
+      ray_idx = random.permutation(random.PRNGKey(0), num_rays)
+      ray_idx = ray_idx[:config.vis_num_rays]
+      for k in keys:
+        rendering[k] = [r[ray_idx] for r in rendering[k]]
 
   return rendering

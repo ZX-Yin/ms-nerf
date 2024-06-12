@@ -16,10 +16,10 @@
 export CUDA_VISIBLE_DEVICES='0,1'
 
 # for synthetic part
-SCENE=Scene01
-EXPERIMENT=logs_MS-Mip-NeRF-360
-DATA_DIR=/mnt/sda/T3/cvpr23/dataset/synthetic_scenes
-CHECKPOINT_DIR=/mnt/sda/experiments/cvpr23/Mip-NeRF-360/"$EXPERIMENT"/"$SCENE"
+SCENE=Scene04
+EXPERIMENT=MS-Mip-NeRF-360
+DATA_DIR=/jiaopengyi/ms-nerf/jax/dataset
+CHECKPOINT_DIR=/jiaopengyi/ms-nerf/jax/output/"$EXPERIMENT"/"$SCENE"
 
 python -m eval \
   --gin_configs=configs/ms-nerf/ms360.gin \
@@ -28,15 +28,15 @@ python -m eval \
   --logtostderr
 
 # for real captured part
-SCENE=Scan01
-EXPERIMENT=logs_MS-Mip-NeRF-360
-DATA_DIR=/mnt/sda/experiments/cvpr23_real_cap_dataset
-CHECKPOINT_DIR=/mnt/sda/experiments/cvpr23/Mip-NeRF-360/"$EXPERIMENT"/"$SCENE"
+# SCENE=Scan01
+# EXPERIMENT=logs_MS-Mip-NeRF-360
+# DATA_DIR=/mnt/sda/experiments/cvpr23_real_cap_dataset
+# CHECKPOINT_DIR=/mnt/sda/experiments/cvpr23/Mip-NeRF-360/"$EXPERIMENT"/"$SCENE"
 
-python -m eval \
-  --gin_configs=configs/ms-nerf/ms360.gin \
-  --gin_bindings="Config.dataset_loader = 'llff'" \
-  --gin_bindings="Config.factor = 8" \
-  --gin_bindings="Config.data_dir = '${DATA_DIR}/${SCENE}'" \
-  --gin_bindings="Config.checkpoint_dir = '${CHECKPOINT_DIR}'" \
-  --logtostderr
+# python -m eval \
+#   --gin_configs=configs/ms-nerf/ms360.gin \
+#   --gin_bindings="Config.dataset_loader = 'llff'" \
+#   --gin_bindings="Config.factor = 8" \
+#   --gin_bindings="Config.data_dir = '${DATA_DIR}/${SCENE}'" \
+#   --gin_bindings="Config.checkpoint_dir = '${CHECKPOINT_DIR}'" \
+#   --logtostderr

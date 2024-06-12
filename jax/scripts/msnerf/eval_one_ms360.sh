@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2023 Ze-Xin Yin
+# Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,21 +21,20 @@ EXPERIMENT=MS-Mip-NeRF-360
 DATA_DIR=/jiaopengyi/ms-nerf/jax/dataset
 CHECKPOINT_DIR=/jiaopengyi/ms-nerf/jax/output/"$EXPERIMENT"/"$SCENE"
 
-rm "$CHECKPOINT_DIR"/*
-python -m train \
+python -m eval \
   --gin_configs=configs/ms-nerf/ms360.gin \
   --gin_bindings="Config.data_dir = '${DATA_DIR}/${SCENE}'" \
   --gin_bindings="Config.checkpoint_dir = '${CHECKPOINT_DIR}'" \
+  --gin_bindings="Config.eval_one = (5,300,200)" \
   --logtostderr
 
 # for real captured part
 # SCENE=Scan01
 # EXPERIMENT=logs_MS-Mip-NeRF-360
-# DATA_DIR=/mnt/sda/T3/cvpr23/dataset/posed_real_scenes
+# DATA_DIR=/mnt/sda/experiments/cvpr23_real_cap_dataset
 # CHECKPOINT_DIR=/mnt/sda/experiments/cvpr23/Mip-NeRF-360/"$EXPERIMENT"/"$SCENE"
 
-# rm "$CHECKPOINT_DIR"/*
-# python -m train \
+# python -m eval \
 #   --gin_configs=configs/ms-nerf/ms360.gin \
 #   --gin_bindings="Config.dataset_loader = 'llff'" \
 #   --gin_bindings="Config.factor = 8" \

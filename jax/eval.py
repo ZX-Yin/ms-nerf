@@ -95,6 +95,10 @@ def main(unused_argv):
       if idx >= num_eval:
         print(f'Skipping image {idx+1}/{dataset.size}')
         continue
+      if config.eval_one is not None:
+        if idx != config.eval_one[0]:
+          print(f'Skipping image {idx+1}/{dataset.size}')
+          continue
       print(f'Evaluating image {idx+1}/{dataset.size}')
       rays = batch.rays
       train_frac = state.step / config.max_steps
@@ -186,6 +190,39 @@ def main(unused_argv):
                                 path_fn(f'{key}_{idx:03d}.png'))
 
           utils.save_img_f32(rendering['acc'], path_fn(f'acc_{idx:03d}.tiff'))
+
+      if config.eval_one is not None:
+        out_dir_one = path.join(out_dir, '_'.join([f"{t:03d}" for t in config.eval_one]))
+        utils.makedirs(out_dir_one)
+        path_fn_one = lambda x: path.join(out_dir_one, x)
+        utils.save_img_u8(postprocess_fn(rendering['rgb']),
+                          path_fn_one(f'color_{idx:03d}.png'))
+        utils.save_img_u8(postprocess_fn(rendering['rgb_cc']),
+                          path_fn_one(f'color_cc_{idx:03d}.png'))
+
+        for key in ['distance_mean', 'distance_median']:
+          if key in rendering:
+            utils.save_img_f32(rendering[key],
+                               path_fn_one(f'{key}_{idx:03d}.tiff'))
+
+        for key in ['normals']:
+          if key in rendering:
+            utils.save_img_u8(rendering[key] / 2. + 0.5,
+                              path_fn_one(f'{key}_{idx:03d}.png'))
+
+        utils.save_img_f32(rendering['acc'], path_fn_one(f'acc_{idx:03d}.tiff'))
+
+        _, one_x, one_y = config.eval_one
+        dict_one = {}
+        for key in rendering:
+          if key.startswith('ray_'):
+            dict_one[key] = [r[one_x, one_y] for r in rendering[key]]
+          else:
+            dict_one[key] = rendering[key][one_x, one_y]
+        color_mark = rendering['rgb'].copy()
+        color_mark[one_x, one_y] = np.array([255,0,0])
+        utils.save_img_u8(color_mark, path_fn_one(f'color_mark_{idx:03d}_{one_x}_{one_y}.png'))
+        np.savez(path_fn_one(f'eval_one_{idx:03d}_{one_x}_{one_y}.npz'), dict_one)
 
     if (not config.eval_only_once) and (jax.host_id() == 0):
       summary_writer.scalar('eval_median_render_time', np.median(render_times),

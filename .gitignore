@@ -1,4 +1,7 @@
 jax/internal/pycolmap
+jax/dataset
+jax/output
+# jax/scripts
 **/__pycache__
 .DS_Store
 .vscode/
